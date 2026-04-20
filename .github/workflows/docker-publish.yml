@@ -62,10 +62,8 @@ jobs:
             --cache-dir cache
           
           echo "Copying models..."
-          cp cache/models--TheMuppets--ggrcpp-GGUF/snapshots/*/PaddleOCR-VL-1.5.gguf models/ 2>/dev/null || \
-            cp cache/models--TheMuppets--ggrcpp-GGUF/blobs/*PaddleOCR-VL-1.5.gguf models/
-          cp cache/models--TheMuppets--ggrcpp-GGUF/snapshots/*/PaddleOCR-VL-1.5-mmproj.gguf models/ 2>/dev/null || \
-            cp cache/models--TheMuppets--ggrcpp-GGUF/blobs/*PaddleOCR-VL-1.5-mmproj.gguf models/
+          cp cache/models--PaddlePaddle--PaddleOCR-VL-1.5-GGUF/snapshots/*/PaddleOCR-VL-1.5.gguf models/
+          cp cache/models--PaddlePaddle--PaddleOCR-VL-1.5-GGUF/snapshots/*/PaddleOCR-VL-1.5-mmproj.gguf models/
           
           echo "Models downloaded:"
           ls -lh models/
