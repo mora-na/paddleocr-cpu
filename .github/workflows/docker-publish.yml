@@ -42,7 +42,7 @@ jobs:
           restore-keys: |
             gguf-models-
 
-      - name: Install huggingface-cli
+      - name: Install huggingface-hub
         if: steps.cache-models.outputs.cache-hit != 'true'
         run: pip install -q huggingface-hub
 
@@ -52,14 +52,14 @@ jobs:
           mkdir -p models
           
           echo "Downloading PaddleOCR-VL-1.5.gguf..."
-          huggingface-cli download TheMuppets/ggrcpp-GGUF PaddleOCR-VL-1.5.gguf \
-            --local models/PaddleOCR-VL-1.5.gguf \
-            --token ${{ secrets.HF_TOKEN }}
+          hf download TheMuppets/ggrcpp-GGUF PaddleOCR-VL-1.5.gguf \
+            --token ${{ secrets.HF_TOKEN }} \
+            -o models/PaddleOCR-VL-1.5.gguf
           
           echo "Downloading PaddleOCR-VL-1.5-mmproj.gguf..."
-          huggingface-cli download TheMuppets/ggrcpp-GGUF PaddleOCR-VL-1.5-mmproj.gguf \
-            --local models/PaddleOCR-VL-1.5-mmproj.gguf \
-            --token ${{ secrets.HF_TOKEN }}
+          hf download TheMuppets/ggrcpp-GGUF PaddleOCR-VL-1.5-mmproj.gguf \
+            --token ${{ secrets.HF_TOKEN }} \
+            -o models/PaddleOCR-VL-1.5-mmproj.gguf
           
           echo "Models downloaded:"
           ls -lh models/
