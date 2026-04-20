@@ -33,6 +33,43 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Cache GGUF models
+        id: cache-models
+        uses: actions/cache@v4
+        with:
+          path: models/
+          key: gguf-models-v1
+          restore-keys: |
+            gguf-models-
+
+      - name: Install huggingface-cli
+        if: steps.cache-models.outputs.cache-hit != 'true'
+        run: pip install -q huggingface-hub
+
+      - name: Download GGUF models
+        if: steps.cache-models.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p models
+          
+          echo "Downloading PaddleOCR-VL-1.5.gguf..."
+          huggingface-cli download TheMuppets/ggrcpp-GGUF PaddleOCR-VL-1.5.gguf \
+            --local models/PaddleOCR-VL-1.5.gguf \
+            --token ${{ secrets.HF_TOKEN }}
+          
+          echo "Downloading PaddleOCR-VL-1.5-mmproj.gguf..."
+          huggingface-cli download TheMuppets/ggrcpp-GGUF PaddleOCR-VL-1.5-mmproj.gguf \
+            --local models/PaddleOCR-VL-1.5-mmproj.gguf \
+            --token ${{ secrets.HF_TOKEN }}
+          
+          echo "Models downloaded:"
+          ls -lh models/
+
+      - name: Show cached models
+        if: steps.cache-models.outputs.cache-hit == 'true'
+        run: |
+          echo "Using cached models:"
+          ls -lh models/
+
       - name: Log in to Container Registry
         uses: docker/login-action@v3
         with:

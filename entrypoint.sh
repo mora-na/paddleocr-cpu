@@ -1,10 +1,6 @@
 #!/bin/bash
 set -euo pipefail
 
-# ── 检查模型文件 ───────────────────────────────────────────
-[ -f "$LLAMA_MODEL" ]  || { echo "[ERROR] 模型文件不存在: $LLAMA_MODEL";  exit 1; }
-[ -f "$LLAMA_MMPROJ" ] || { echo "[ERROR] mmproj 不存在: $LLAMA_MMPROJ"; exit 1; }
-
 # ── 内存检查 ───────────────────────────────────────────────
 MEM_MB=$(awk '/MemAvailable/{printf "%.0f",$2/1024}' /proc/meminfo)
 echo "[INFO] 可用内存: ${MEM_MB}MB | ctx: $LLAMA_CTX_SIZE | threads: $LLAMA_THREADS"
