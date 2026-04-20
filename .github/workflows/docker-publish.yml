@@ -49,19 +49,23 @@ jobs:
       - name: Download GGUF models
         if: steps.cache-models.outputs.cache-hit != 'true'
         run: |
-          mkdir -p models
+          mkdir -p models cache
           
           echo "Downloading PaddleOCR-VL-1.5.gguf..."
           hf download TheMuppets/ggrcpp-GGUF PaddleOCR-VL-1.5.gguf \
             --token ${{ secrets.HF_TOKEN }} \
-            --local-dir models \
-            --local-dir-use-symlinks False
+            --cache-dir cache
           
           echo "Downloading PaddleOCR-VL-1.5-mmproj.gguf..."
           hf download TheMuppets/ggrcpp-GGUF PaddleOCR-VL-1.5-mmproj.gguf \
             --token ${{ secrets.HF_TOKEN }} \
-            --local-dir models \
-            --local-dir-use-symlinks False
+            --cache-dir cache
+          
+          echo "Copying models..."
+          cp cache/models--TheMuppets--ggrcpp-GGUF/snapshots/*/PaddleOCR-VL-1.5.gguf models/ 2>/dev/null || \
+            cp cache/models--TheMuppets--ggrcpp-GGUF/blobs/*PaddleOCR-VL-1.5.gguf models/
+          cp cache/models--TheMuppets--ggrcpp-GGUF/snapshots/*/PaddleOCR-VL-1.5-mmproj.gguf models/ 2>/dev/null || \
+            cp cache/models--TheMuppets--ggrcpp-GGUF/blobs/*PaddleOCR-VL-1.5-mmproj.gguf models/
           
           echo "Models downloaded:"
           ls -lh models/
