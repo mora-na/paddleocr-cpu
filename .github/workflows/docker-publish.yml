@@ -54,12 +54,14 @@ jobs:
           echo "Downloading PaddleOCR-VL-1.5.gguf..."
           hf download TheMuppets/ggrcpp-GGUF PaddleOCR-VL-1.5.gguf \
             --token ${{ secrets.HF_TOKEN }} \
-            -o models/PaddleOCR-VL-1.5.gguf
+            --local-dir models \
+            --local-dir-use-symlinks False
           
           echo "Downloading PaddleOCR-VL-1.5-mmproj.gguf..."
           hf download TheMuppets/ggrcpp-GGUF PaddleOCR-VL-1.5-mmproj.gguf \
             --token ${{ secrets.HF_TOKEN }} \
-            -o models/PaddleOCR-VL-1.5-mmproj.gguf
+            --local-dir models \
+            --local-dir-use-symlinks False
           
           echo "Models downloaded:"
           ls -lh models/
