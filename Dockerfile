@@ -1,30 +1,27 @@
 # ─────────────────────────────────────────────
-# Stage 1: 编译 llama-server
+# Stage 1: 下载预编译 llama-server
 # ─────────────────────────────────────────────
-FROM debian:bookworm-slim AS builder
-
-ENV DEBIAN_FRONTEND=noninteractive
+FROM debian:bookworm-slim AS downloader
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential cmake git \
-    libopenblas-dev pkg-config \
+    curl ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-RUN git clone --depth 1 https://github.com/ggml-org/llama.cpp.git /build
+ARG TARGETARCH
+ARG LLAMA_VERSION=v1.3.1
 
-RUN cmake -B /build/build /build \
-    -DGGML_BLAS=ON \
-    -DGGML_BLAS_VENDOR=OpenBLAS \
-    -DGGML_AVX2=ON \
-    -DGGML_FMA=ON \
-    -DGGML_NATIVE=OFF \
-    -DGGML_CUDA=OFF \
-    -DGGML_METAL=OFF \
-    -DCMAKE_BUILD_TYPE=Release \
-    && cmake --build /build/build \
-    --target llama-server \
-    --config Release \
-    -j$(nproc)
+# 下载预编译的 llama-server
+RUN case "${TARGETARCH}" in \
+    amd64) ARCH="x64" ;; \
+    arm64) ARCH="arm64" ;; \
+    *) echo "Unsupported architecture: ${TARGETARCH}" && exit 1 ;; \
+    esac \
+    && curl -sL "https://github.com/ggml-org/llama.cpp/releases/download/${LLAMA_VERSION}/llama-server-${ARCH}-linux-${TARGETARCH}.zip" \
+    -o /tmp/llama-server.zip \
+    && unzip -j /tmp/llama-server.zip "llama-server-${ARCH}-linux-${TARGETARCH}" -d /usr/local/bin/ \
+    && chmod +x /usr/local/bin/llama-server \
+    && rm /tmp/llama-server.zip \
+    && llama-server --version
 
 
 # ─────────────────────────────────────────────
@@ -42,7 +39,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --from=builder /build/build/bin/llama-server /usr/local/bin/llama-server
+COPY --from=downloader /usr/local/bin/llama-server /usr/local/bin/llama-server
 COPY entrypoint.sh /entrypoint.sh
 COPY models/ /models/
 
